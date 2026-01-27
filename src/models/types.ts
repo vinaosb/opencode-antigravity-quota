@@ -33,3 +33,19 @@ export interface BackoffConfig {
     maxRetries: number;
     errorCacheSeconds: number;
 }
+
+export interface OpenCodeAccount {
+    email: string;
+    refreshToken: string;
+    projectId: string;
+    addedAt: number;
+    lastUsed: number;
+    rateLimitResetTimes?: Record<string, number>;
+    managedProjectId?: string;
+}
+
+export interface OpenCodeAccountsFile {
+    version: number;
+    accounts: OpenCodeAccount[];
+    activeIndex?: number;
+}

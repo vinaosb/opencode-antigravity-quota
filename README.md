@@ -9,10 +9,13 @@ A VS Code extension to monitor usage quotas across multiple OpenCode accounts.
 - **24h History Tracking**: Automatic history collection with up to 24 data points per account (FIFO eviction).
 - **Details View**: Interactive visualization with SVG charts showing quota usage over time.
 - **Edit Account**: Update account name or token via a simple QuickPick interface.
-- **Exponential Backoff**: Smart retry logic for API resilience (1s base, 2x multiplier, max 5 retries).
+- **Enhanced Backoff**: Advanced exponential backoff with jitter and configurable retries for maximum resilience.
+- **Concurrency Limiting**: Throttles concurrent API requests to prevent overwhelming endpoints.
+- **Error Caching**: Intelligent caching of error responses (30s TTL) to reduce unnecessary retries.
 - **Rate-Limit Resilience**: Graceful handling of 429/5xx errors with automatic cooldown periods.
-- **Debug Logging**: Comprehensive logging in the Output panel with automatic masking of sensitive data.
+- **Debug Logging**: Comprehensive logging with automatic masking of sensitive headers and data.
 - **Secure Storage**: Tokens are stored in VS Code `SecretStorage` (never in plain text or settings.json).
+- **Import Utility**: Easily import accounts from the **OpenCode antigravity-auth** plugin.
 - **Configurable Adapter**: Works with different JSON response shapes via path mapping.
 
 ## Setup & Configuration
@@ -73,6 +76,26 @@ If you have the **OpenCode antigravity-auth** plugin installed, you can import y
 3. Confirm the number of accounts to import.
 4. Accounts will be imported as **OAuth** type, leveraging your existing refresh tokens.
 
+**Technical Details**:
+- The extension looks for `antigravity-accounts.json` in:
+  - **Linux/macOS**: `~/.config/opencode/`
+  - **Windows**: `%APPDATA%\opencode\`
+- It imports `refreshToken` and sets up the accounts with the default OpenCode quota endpoint.
+
+### 6. Configuration Reference
+You can fine-tune the extension's behavior in `settings.json`:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `opencodeQuota.pollIntervalMs` | `300000` | Automatic refresh interval in milliseconds (min 60s). |
+| `opencodeQuota.maxConcurrentRequests` | `3` | Maximum number of concurrent API requests across all accounts. |
+| `opencodeQuota.httpTimeoutMs` | `30000` | HTTP request timeout in milliseconds. |
+| `opencodeQuota.backoff.baseDelayMs` | `10000` | Base delay for exponential backoff (ms). |
+| `opencodeQuota.backoff.multiplier` | `2` | Multiplier for exponential backoff. |
+| `opencodeQuota.backoff.maxDelayMs` | `300000` | Maximum delay for exponential backoff (ms). |
+| `opencodeQuota.backoff.maxRetries` | `8` | Maximum number of retries for rate-limited requests. |
+| `opencodeQuota.backoff.errorCacheSeconds` | `30` | Duration to cache error responses. |
+
 ## Available Commands
 
 | Command | Description |
@@ -123,8 +146,8 @@ The extension follows a service-oriented architecture using the **Singleton Patt
 #### Core Services
 - **SecretStorageService**: Secure persistence of API tokens using VS Code's `SecretStorage`.
 - **HistoryService**: Tracks up to 24 history points per account in `globalState`.
-- **LoggingService**: Handles structured logging with automatic secret masking.
-- **QuotaService**: Manages API communication, caching, exponential backoff, and rate-limit state.
+- **QuotaService**: Manages API communication with concurrency limiting, exponential backoff (with jitter), error caching, and in-flight request locking.
+- **LoggingService**: Handles structured logging with automatic secret masking (including Authorization headers).
 
 #### UI Components
 - **QuotaStatusBar**: Aggregates usage across all accounts for the status bar.
@@ -161,8 +184,17 @@ UI (StatusBar / TreeView / DetailsView)
 - Points are collected automatically every time the data refreshes successfully.
 
 #### Rate Limits triggering frequently
-- The extension uses automatic exponential backoff (1s base, 2x multiplier).
+- The extension uses automatic exponential backoff (configurable via `opencodeQuota.backoff`).
 - Check the **Output** panel for "Cooldown" messages indicating when the next fetch is allowed.
+- **Polling Interval**: If you have many accounts, consider increasing `opencodeQuota.pollIntervalMs` to avoid hitting aggregate rate limits.
+
+#### Accounts not refreshing simultaneously
+- The extension limits concurrent requests (default: 3) to be a good citizen to API endpoints. Some accounts may stay in "Loading..." slightly longer if many are configured.
+
+#### Import from OpenCode failed
+- Ensure the **OpenCode antigravity-auth** plugin is active.
+- Verify that you have accounts configured in that plugin.
+- Check the **Output** panel for specific error messages during the import process.
 
 #### Extension not loading
 - Ensure all dependencies are installed (`npm install`).
@@ -178,6 +210,7 @@ UI (StatusBar / TreeView / DetailsView)
 #### Secret Masking
 - The `LoggingService` automatically masks sensitive information in logs.
 - Any object property containing `token`, `password`, `secret`, or `key` (case-insensitive) is replaced with `***`.
+- **Header Protection**: Authorization headers are automatically masked before being sent to the output channel.
 
 #### Best Practices
 - Use dedicated API tokens with the minimum required scopes.

@@ -1043,7 +1043,7 @@ function startAutoRefresh(config: vscode.WorkspaceConfiguration) {
 - [x] Document API endpoints used
 - [x] Document rate limiting behavior
 - [x] Document caching strategy
-- [ ] Provide support contact
+- [x] Provide support contact
 
 ---
 

@@ -120,3 +120,6 @@
     - Account edit (`opencodeQuota.editAccount`).
     - Account import (`opencodeQuota.importFromOpenCode`).
 - Verified that automatic polls do not clear the cache, allowing them to reuse results if they haven't expired.
+## Phase 4.3 Documentation - Add support/contact information
+- Added Support section to README.md with GitHub repository and issue reporting instructions.
+- Followed existing markdown style and structure.

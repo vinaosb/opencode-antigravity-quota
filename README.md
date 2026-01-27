@@ -214,6 +214,18 @@ The cache is automatically invalidated in the following scenarios:
 | `OpenCode Quota: View Details` | Open detailed webview with history chart |
 | `OpenCode Quota: Import OpenCode Accounts` | Import accounts from OpenCode antigravity-auth plugin |
 
+## Support
+
+If you encounter any issues or have questions about the OpenCode Quota Monitor, please use the following resources:
+
+- **GitHub Repository**: [https://github.com/vinaosb/opencode-antigravity-quota](https://github.com/vinaosb/opencode-antigravity-quota)
+- **Issue Reporting**: If you find a bug or have a feature request, please [open an issue](https://github.com/vinaosb/opencode-antigravity-quota/issues) on GitHub.
+
+When reporting an issue, please include:
+- A clear description of the problem.
+- Steps to reproduce the issue.
+- Any relevant error messages from the **OpenCode Quota Monitor** output channel.
+
 ## Development
 
 ### Prerequisites

@@ -188,6 +188,48 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('opencodeQuota.importFromOpenCode', async () => {
+            const secretStorageService = SecretStorageService.instanceRef;
+            const openCodeAccounts = await secretStorageService.importOpenCodeAccounts();
+
+            if (openCodeAccounts.length === 0) {
+                vscode.window.showInformationMessage(
+                    'No OpenCode accounts found. Make sure the antigravity-auth plugin is installed and has accounts configured.',
+                    'OK'
+                );
+                return;
+            }
+
+            const confirm = await vscode.window.showQuickPick(
+                [{ label: `Import ${openCodeAccounts.length} accounts`, description: 'From OpenCode antigravity-auth' }],
+                { placeHolder: 'Confirm import' }
+            );
+
+            if (!confirm) {
+                return;
+            }
+
+            const imported = await secretStorageService.importFromOpenCode(openCodeAccounts);
+            const currentConfig = vscode.workspace.getConfiguration('opencodeQuota');
+            const existingAccounts = currentConfig.get<Account[]>('accounts', []);
+            
+            // Avoid adding accounts if they already exist with same name
+            const newAccounts = [...existingAccounts];
+            for (const imp of imported) {
+                if (!newAccounts.some(a => a.name === imp.name)) {
+                    newAccounts.push(imp);
+                }
+            }
+
+            await currentConfig.update('accounts', newAccounts, vscode.ConfigurationTarget.Global);
+            
+            vscode.window.showInformationMessage(`Successfully imported ${imported.length} accounts from OpenCode.`, 'OK');
+            LoggingService.instanceRef.logInfo(`Imported ${imported.length} OpenCode accounts: ${imported.map(a => a.name).join(', ')}`);
+            refresh();
+        })
+    );
+
+    context.subscriptions.push(
         vscode.commands.registerCommand('opencodeQuota.openDetails', async (item?: any) => {
             if (!item || !item.status) {
                 vscode.window.showWarningMessage('Select an account to view details');

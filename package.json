@@ -35,6 +35,10 @@
       {
         "command": "opencodeQuota.openDetails",
         "title": "OpenCode Quota: Open Details"
+      },
+      {
+        "command": "opencodeQuota.importFromOpenCode",
+        "title": "OpenCode Quota: Import OpenCode Accounts"
       }
     ],
     "viewsContainers": {

@@ -96,6 +96,61 @@ You can fine-tune the extension's behavior in `settings.json`:
 | `opencodeQuota.backoff.maxRetries` | `8` | Maximum number of retries for rate-limited requests. |
 | `opencodeQuota.backoff.errorCacheSeconds` | `30` | Duration to cache error responses. |
 
+## API Endpoints
+
+The extension fetches quota information from the configured endpoints for each account.
+
+#### Default Endpoint
+When importing accounts from OpenCode antigravity-auth, the default endpoint is:
+`https://cloudcode-pa.sandbox.googleapis.com/v1internal:fetchAvailableModels`
+
+#### Request Configuration
+- **Method**: `GET`
+- **Headers**:
+  - `Authorization`: `Bearer <token>`
+  - `Content-Type`: `application/json`
+- **Timeout**: Default is 30 seconds (`30000ms`), configurable via `opencodeQuota.httpTimeoutMs`.
+
+#### Expected Response Structure
+By default, the extension expects a JSON response with the following structure:
+
+```json
+{
+  "usage": {
+    "total_tokens": 123
+  },
+  "quota": {
+    "limit": 1000,
+    "reset_date": "2024-05-20T12:00:00Z"
+  }
+}
+```
+
+#### Custom Endpoints & Adapters
+You can use any API endpoint that returns quota information. If your API uses a different response structure, you can configure the mapping using the `opencodeQuota.adapterConfig` setting.
+
+For example, if your API returns:
+```json
+{
+  "data": {
+    "current_usage": 50,
+    "max_limit": 500
+  },
+  "meta": {
+    "reset_at": "2024-05-21T00:00:00Z"
+  }
+}
+```
+
+You should configure:
+```json
+"opencodeQuota.adapterConfig": {
+    "usedPath": "data.current_usage",
+    "limitPath": "data.max_limit",
+    "resetPath": "meta.reset_at"
+}
+```
+
 ## Available Commands
 
 | Command | Description |

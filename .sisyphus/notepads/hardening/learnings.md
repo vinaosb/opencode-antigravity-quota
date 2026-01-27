@@ -93,3 +93,9 @@
 - Verified that sensitive tokens (super-secret-token) and cookies (session=secret) are replaced with "***" in the output channel.
 - Confirmed that masking is case-insensitive for header names.
 - All 114 tests passed, ensuring 100% test coverage for secret masking logic.
+
+### Phase 4.3: API Endpoint Documentation
+- Added a new section to README.md documenting the default OpenCode quota endpoint and request configuration (Method: GET, Headers, Timeout).
+- Provided an example of the expected JSON response structure.
+- Documented how custom endpoints and adapters can be used via `opencodeQuota.adapterConfig`.
+- Ensured documentation accurately reflects the implementation in `QuotaService.ts` and `SecretStorageService.ts`.

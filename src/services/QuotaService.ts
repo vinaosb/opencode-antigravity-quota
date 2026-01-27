@@ -1,5 +1,7 @@
-import axios from 'axios';
+ import axios from 'axios';
+import pLimit from 'p-limit';
 import { Account, AccountStatus, QuotaAdapterConfig } from '../models/types';
+
 import { SecretStorageService } from './SecretStorageService';
 import { QuotaAdapter } from '../adapter/QuotaAdapter';
 import { HistoryService } from './HistoryService';
@@ -132,8 +134,9 @@ export class QuotaService {
         }
     }
 
-    async fetchAll(accounts: Account[], adapterConfig: QuotaAdapterConfig): Promise<AccountStatus[]> {
-        return Promise.all(accounts.map(acc => this.fetchQuota(acc, adapterConfig)));
+    async fetchAll(accounts: Account[], adapterConfig: QuotaAdapterConfig, maxConcurrent = 3): Promise<AccountStatus[]> {
+        const limit = pLimit(maxConcurrent);
+        return Promise.all(accounts.map(acc => limit(() => this.fetchQuota(acc, adapterConfig))));
     }
 
     clearCache() {

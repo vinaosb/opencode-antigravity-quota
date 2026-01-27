@@ -158,4 +158,30 @@ suite('QuotaService Test Suite', () => {
         
         assert.ok(axiosGetStub.calledTwice);
     });
+
+    test('fetchAll should respect concurrency limit', async () => {
+        const accounts: Account[] = [
+            { name: 'acc1', endpoint: 'api1', tokenSecretName: 's1', type: 'token' },
+            { name: 'acc2', endpoint: 'api2', tokenSecretName: 's2', type: 'token' },
+            { name: 'acc3', endpoint: 'api3', tokenSecretName: 's3', type: 'token' },
+            { name: 'acc4', endpoint: 'api4', tokenSecretName: 's4', type: 'token' },
+            { name: 'acc5', endpoint: 'api5', tokenSecretName: 's5', type: 'token' }
+        ];
+
+        let activeRequests = 0;
+        let maxConcurrentObserved = 0;
+
+        axiosGetStub.callsFake(async () => {
+            activeRequests++;
+            maxConcurrentObserved = Math.max(maxConcurrentObserved, activeRequests);
+            await new Promise(resolve => setTimeout(resolve, 50));
+            activeRequests--;
+            return { data: { usage: { total_tokens: 500 }, quota: { limit: 1000 } } };
+        });
+
+        const maxConcurrent = 2;
+        await quotaService.fetchAll(accounts, adapterConfig, maxConcurrent);
+
+        assert.strictEqual(maxConcurrentObserved, maxConcurrent);
+    });
 });

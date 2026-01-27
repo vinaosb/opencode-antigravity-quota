@@ -24,7 +24,8 @@ export class QuotaService {
         ttlSeconds: number,
         private loggingService: LoggingService,
         private historyService: HistoryService,
-        backoffConfig?: BackoffConfig
+        backoffConfig?: BackoffConfig,
+        private httpTimeoutMs: number = 30000
     ) {
         this.cacheTTL = ttlSeconds * 1000;
         this.backoffConfig = backoffConfig || {
@@ -95,7 +96,7 @@ export class QuotaService {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                timeout: 5000
+                timeout: this.httpTimeoutMs
             });
 
             const adapter = new QuotaAdapter(adapterConfig);

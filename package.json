@@ -82,6 +82,11 @@
           "default": 3,
           "description": "Maximum number of concurrent API requests"
         },
+        "opencodeQuota.httpTimeoutMs": {
+          "type": "number",
+          "default": 30000,
+          "description": "HTTP request timeout in milliseconds"
+        },
         "opencodeQuota.backoff.baseDelayMs": {
           "type": "number",
           "default": 10000,

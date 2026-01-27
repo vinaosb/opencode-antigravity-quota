@@ -135,6 +135,9 @@ export class QuotaService {
                 ? `API Error: ${error.response?.status} - ${error.message}`
                 : `Error: ${error.message}`;
             
+            const strippedError = this.stripHeaders(error);
+            this.loggingService.logInfo(errorMsg, strippedError);
+            
             const errorStatus: AccountStatus = {
                 account,
                 quota: null,
@@ -195,6 +198,57 @@ export class QuotaService {
             retryCount,
             nextRetryTime: nextRetry
         });
+    }
+
+    private stripHeaders(error: any): any {
+        if (!error || typeof error !== 'object') {
+            return error;
+        }
+
+        // Recursive helper to remove headers
+        const removeHeaders = (obj: any): any => {
+            if (!obj || typeof obj !== 'object' || obj instanceof Error) {
+                return obj;
+            }
+
+            if (Array.isArray(obj)) {
+                return obj.map(item => removeHeaders(item));
+            }
+
+            const cleaned: any = {};
+            for (const key of Object.keys(obj)) {
+                const lowerKey = key.toLowerCase();
+                if (
+                    lowerKey === 'request' ||
+                    lowerKey === 'response' ||
+                    lowerKey.startsWith('headers-')
+                ) {
+                    continue;
+                }
+                if (
+                    lowerKey.includes('authorization') ||
+                    lowerKey.includes('cookie')
+                ) {
+                    cleaned[key] = '***';
+                    continue;
+                }
+                cleaned[key] = removeHeaders(obj[key]);
+            }
+            return cleaned;
+        };
+
+        const result = { ...error };
+        if (result.config) {
+            result.config = removeHeaders(result.config);
+        }
+        if (result.request) {
+            delete result.request;
+        }
+        if (result.response) {
+            result.response = removeHeaders(result.response);
+        }
+
+        return result;
     }
 
     async fetchAll(accounts: Account[], adapterConfig: QuotaAdapterConfig, maxConcurrent = 3): Promise<AccountStatus[]> {

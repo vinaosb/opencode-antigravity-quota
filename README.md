@@ -66,6 +66,13 @@ Custom mapping example:
 }
 ```
 
+### 5. Import OpenCode Accounts
+If you have the **OpenCode antigravity-auth** plugin installed, you can import your existing accounts:
+1. Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`).
+2. Run `OpenCode Quota: Import OpenCode Accounts`.
+3. Confirm the number of accounts to import.
+4. Accounts will be imported as **OAuth** type, leveraging your existing refresh tokens.
+
 ## Available Commands
 
 | Command | Description |
@@ -75,6 +82,7 @@ Custom mapping example:
 | `OpenCode Quota: Edit Account` | Update account name or token |
 | `OpenCode Quota: Refresh` | Manually refresh all account data |
 | `OpenCode Quota: View Details` | Open detailed webview with history chart |
+| `OpenCode Quota: Import OpenCode Accounts` | Import accounts from OpenCode antigravity-auth plugin |
 
 ## Development
 

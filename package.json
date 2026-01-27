@@ -1,0 +1,113 @@
+{
+  "name": "opencode-quota-monitor",
+  "displayName": "OpenCode Quota Monitor",
+  "description": "Monitor usage quotas across multiple OpenCode accounts",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "opencodeQuota.refresh",
+        "title": "OpenCode Quota: Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "opencodeQuota.addAccount",
+        "title": "OpenCode Quota: Add Account"
+      },
+      {
+        "command": "opencodeQuota.removeAccount",
+        "title": "OpenCode Quota: Remove Account"
+      },
+      {
+        "command": "opencodeQuota.editAccount",
+        "title": "OpenCode Quota: Edit Account"
+      },
+      {
+        "command": "opencodeQuota.openDetails",
+        "title": "OpenCode Quota: Open Details"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "opencode-quota-monitor",
+          "title": "Quota Monitor",
+          "icon": "$(dashboard)"
+        }
+      ]
+    },
+    "views": {
+      "opencode-quota-monitor": [
+        {
+          "id": "opencodeQuotaAccounts",
+          "name": "Accounts"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "OpenCode Quota Monitor",
+      "properties": {
+        "opencodeQuota.accounts": {
+          "type": "array",
+          "default": [],
+          "description": "List of configured accounts"
+        },
+        "opencodeQuota.refreshIntervalSeconds": {
+          "type": "number",
+          "default": 300,
+          "description": "Automatic refresh interval in seconds"
+        },
+        "opencodeQuota.cacheTTLSeconds": {
+          "type": "number",
+          "default": 600,
+          "description": "Cache TTL in seconds"
+        },
+        "opencodeQuota.adapterConfig": {
+          "type": "object",
+          "default": {},
+          "description": "Adapter configuration for mapping API responses"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/nock": "^10.0.3",
+    "@types/node": "18.x",
+    "@types/sinon": "^21.0.0",
+    "@types/vscode": "^1.80.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "@vscode/test-electron": "^2.3.0",
+    "eslint": "^8.39.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "nock": "^14.0.10",
+    "sinon": "^21.0.1",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "p-limit": "^4.0.0",
+    "vsce": "^2.15.0"
+  }
+}

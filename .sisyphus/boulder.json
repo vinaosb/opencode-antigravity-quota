@@ -1,0 +1,11 @@
+{
+  "active_plan": "C:\\Users\\vsbb1\\source\\repos\\antigravity-opencode-quota\\.sisyphus\\plans\\hardening.md",
+  "started_at": "2026-01-27T05:35:31.451Z",
+  "session_ids": [
+    "ses_4028f9bfaffejkuYjFn7Sfo6oD"
+  ],
+  "plan_name": "hardening",
+  "dependencies": {
+    "p-limit": "^4.0.0"
+  }
+}

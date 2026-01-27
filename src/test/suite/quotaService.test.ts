@@ -43,13 +43,52 @@ suite('QuotaService Test Suite', () => {
             baseDelayMs: 1000,
             multiplier: 2,
             maxDelayMs: 32000,
-            maxRetries: 5,
-            errorCacheSeconds: 0
+             maxRetries: 5,
+            errorCacheSeconds: 30
         });
     });
 
     teardown(() => {
         sandbox.restore();
+    });
+
+    suite('Error Caching', () => {
+        test('should cache error for configured TTL', async () => {
+            axiosGetStub.rejects(new Error('Persistent error'));
+            const now = Date.now();
+            const dateStub = sandbox.stub(Date, 'now').returns(now);
+
+            // First call - should hit API
+            const res1 = await quotaService.fetchQuota(account, adapterConfig);
+            assert.strictEqual(res1.status, 'error');
+            assert.strictEqual(axiosGetStub.callCount, 1);
+
+            // Second call (after 10s) - should return cached error
+            dateStub.returns(now + 10000);
+            const res2 = await quotaService.fetchQuota(account, adapterConfig);
+            assert.strictEqual(res2.status, 'error');
+            assert.strictEqual(axiosGetStub.callCount, 1); // Still called only once
+            assert.ok(loggingServiceMock.logInfo.calledWithMatch('Returning cached error for testAccount'));
+
+            // Third call (after 31s) - should hit API again
+            dateStub.returns(now + 31000);
+            axiosGetStub.onSecondCall().resolves({ data: { usage: { total_tokens: 500 }, quota: { limit: 1000 } } });
+            const res3 = await quotaService.fetchQuota(account, adapterConfig);
+            assert.strictEqual(res3.status, 'ok');
+            assert.strictEqual(axiosGetStub.callCount, 2);
+        });
+
+        test('clearCache should clear error cache', async () => {
+            axiosGetStub.rejects(new Error('Persistent error'));
+            await quotaService.fetchQuota(account, adapterConfig);
+            
+            quotaService.clearCache();
+            
+            axiosGetStub.onSecondCall().resolves({ data: { usage: { total_tokens: 500 }, quota: { limit: 1000 } } });
+            const res = await quotaService.fetchQuota(account, adapterConfig);
+            assert.strictEqual(res.status, 'ok');
+            assert.strictEqual(axiosGetStub.callCount, 2);
+        });
     });
 
     test('should call addHistoryPoint on success', async () => {

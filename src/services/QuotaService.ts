@@ -7,8 +7,14 @@ import { QuotaAdapter } from '../adapter/QuotaAdapter';
 import { HistoryService } from './HistoryService';
 import { LoggingService } from './LoggingService';
 
+ interface CacheEntry {
+    status: AccountStatus;
+    expiresAt: Date;
+}
+
 export class QuotaService {
-    private cache: Map<string, AccountStatus> = new Map();
+    private cache: Map<string, CacheEntry> = new Map();
+    private errorCache: Map<string, CacheEntry> = new Map();
     private cacheTTL: number = 300 * 1000; // 5 mins default
     private rateLimitState: Map<string, { retryCount: number, nextRetryTime: Date }> = new Map();
     private inFlight: Map<string, Promise<AccountStatus | null>> = new Map();
@@ -54,13 +60,13 @@ export class QuotaService {
     }
 
     private async doFetchQuota(account: Account, adapterConfig: QuotaAdapterConfig): Promise<AccountStatus> {
-        const cached = this.cache.get(account.name);
         const now = Date.now();
 
         // Check Rate Limit State
         const rateLimit = this.rateLimitState.get(account.name);
         if (rateLimit && now < rateLimit.nextRetryTime.getTime()) {
             this.loggingService.logInfo(`Skipping fetch for ${account.name} in cooldown. Next retry after: ${rateLimit.nextRetryTime.toISOString()}`);
+            const cached = this.getCached(account.name);
             if (cached) {
                 return cached;
             }
@@ -73,11 +79,9 @@ export class QuotaService {
             };
         }
 
+        const cached = this.getCached(account.name);
         if (cached) {
-            const ttl = cached.status === 'error' ? this.backoffConfig.errorCacheSeconds * 1000 : this.cacheTTL;
-            if (now - cached.lastUpdated < ttl) {
-                return cached;
-            }
+            return cached;
         }
 
         try {
@@ -109,7 +113,10 @@ export class QuotaService {
             await this.historyService.addHistoryPoint(account.name, quota);
             this.loggingService.logInfo(`Successfully fetched quota for ${account.name}`);
 
-            this.cache.set(account.name, status);
+            this.cache.set(account.name, {
+                status,
+                expiresAt: new Date(now + this.cacheTTL)
+            });
             return status;
 
         } catch (error: any) {
@@ -136,10 +143,30 @@ export class QuotaService {
                 lastUpdated: now
             };
             
-            // Do not cache errors for full TTL, maybe shorter
-            this.cache.set(account.name, errorStatus);
+            // Cache errors separately with shorter TTL
+            this.errorCache.set(account.name, {
+                status: errorStatus,
+                expiresAt: new Date(now + this.backoffConfig.errorCacheSeconds * 1000)
+            });
             return errorStatus;
         }
+    }
+
+    private getCached(accountName: string): AccountStatus | null {
+        // Check main cache first (successes)
+        const cached = this.cache.get(accountName);
+        if (cached && Date.now() < cached.expiresAt.getTime()) {
+            return cached.status;
+        }
+
+        // Check error cache
+        const errorCached = this.errorCache.get(accountName);
+        if (errorCached && Date.now() < errorCached.expiresAt.getTime()) {
+            this.loggingService.logInfo(`Returning cached error for ${accountName}`);
+            return errorCached.status;
+        }
+
+        return null;
     }
 
     private calculateBackoff(retryCount: number): number {
@@ -177,6 +204,7 @@ export class QuotaService {
 
     clearCache() {
         this.cache.clear();
+        this.errorCache.clear();
     }
 
     public dispose() {

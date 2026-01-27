@@ -68,3 +68,15 @@
 ### Manual Verification Learnings
 - Comprehensive integration tests can effectively simulate manual verification steps (concurrency bursts, error caching TTL, header masking) when a GUI environment is not available.
 - Verification document serves as a "QA Certificate" ensuring all hardening features meet production standards before publishing.
+2026-01-27: Created MANUAL_VERIFICATION_STEPS.md providing detailed manual verification guide for all hardening features (concurrency, backoff, error caching, masking, timeout, import).
+### Account Rotation Strategy Implementation
+- Implemented  to prioritize accounts with more remaining quota.
+- Used  field from  as the primary metric for sorting.
+- Integrated sorting into  to ensure accounts with higher quota are processed first when concurrency is limited.
+- Added unit tests to verify sorting logic and handling of missing data.
+
+### Account Rotation Strategy Implementation
+- Implemented sortAccountsByQuota to prioritize accounts with more remaining quota.
+- Used remaining field from QuotaUsage as the primary metric for sorting.
+- Integrated sorting into fetchAll to ensure accounts with higher quota are processed first when concurrency is limited.
+- Added unit tests to verify sorting logic and handling of missing data.

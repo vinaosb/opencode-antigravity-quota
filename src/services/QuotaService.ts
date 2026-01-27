@@ -252,9 +252,22 @@ export class QuotaService {
         return result;
     }
 
+    private sortAccountsByQuota(accounts: Account[]): Account[] {
+        return [...accounts].sort((a, b) => {
+            const statusA = this.getCached(a.name);
+            const statusB = this.getCached(b.name);
+
+            const remainingA = statusA?.quota?.remaining ?? 0;
+            const remainingB = statusB?.quota?.remaining ?? 0;
+
+            return remainingB - remainingA; // Sort descending (most quota first)
+        });
+    }
+
     async fetchAll(accounts: Account[], adapterConfig: QuotaAdapterConfig, maxConcurrent = 3): Promise<AccountStatus[]> {
+        const sortedAccounts = this.sortAccountsByQuota(accounts);
         const limit = pLimit(maxConcurrent);
-        return Promise.all(accounts.map(acc => limit(() => this.fetchQuota(acc, adapterConfig))));
+        return Promise.all(sortedAccounts.map(acc => limit(() => this.fetchQuota(acc, adapterConfig))));
     }
 
     clearCache() {

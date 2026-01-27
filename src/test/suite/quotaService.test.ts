@@ -234,4 +234,54 @@ suite('QuotaService Test Suite', () => {
 
         assert.strictEqual(maxConcurrentObserved, maxConcurrent);
     });
+
+    suite('Account Rotation', () => {
+        test('sortAccountsByQuota should sort accounts by remaining quota descending', () => {
+            const accounts: Account[] = [
+                { name: 'low', endpoint: 'api1', tokenSecretName: 's1', type: 'token' },
+                { name: 'high', endpoint: 'api2', tokenSecretName: 's2', type: 'token' },
+                { name: 'mid', endpoint: 'api3', tokenSecretName: 's3', type: 'token' }
+            ];
+
+            const now = Date.now();
+            const expiresAt = new Date(now + 10000);
+
+            (quotaService as any).cache.set('low', {
+                status: { account: accounts[0], quota: { remaining: 100 }, status: 'ok', lastUpdated: now },
+                expiresAt
+            });
+            (quotaService as any).cache.set('high', {
+                status: { account: accounts[1], quota: { remaining: 900 }, status: 'ok', lastUpdated: now },
+                expiresAt
+            });
+            (quotaService as any).cache.set('mid', {
+                status: { account: accounts[2], quota: { remaining: 500 }, status: 'ok', lastUpdated: now },
+                expiresAt
+            });
+
+            const sorted = (quotaService as any).sortAccountsByQuota(accounts);
+            
+            assert.strictEqual(sorted[0].name, 'high');
+            assert.strictEqual(sorted[1].name, 'mid');
+            assert.strictEqual(sorted[2].name, 'low');
+        });
+
+        test('sortAccountsByQuota should handle missing quota data', () => {
+            const accounts: Account[] = [
+                { name: 'noData', endpoint: 'api1', tokenSecretName: 's1', type: 'token' },
+                { name: 'hasData', endpoint: 'api2', tokenSecretName: 's2', type: 'token' }
+            ];
+
+            const now = Date.now();
+            (quotaService as any).cache.set('hasData', {
+                status: { account: accounts[1], quota: { remaining: 50 }, status: 'ok', lastUpdated: now },
+                expiresAt: new Date(now + 10000)
+            });
+
+            const sorted = (quotaService as any).sortAccountsByQuota(accounts);
+            
+            assert.strictEqual(sorted[0].name, 'hasData');
+            assert.strictEqual(sorted[1].name, 'noData');
+        });
+    });
 });

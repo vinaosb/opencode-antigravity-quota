@@ -339,11 +339,11 @@ private getCached(accountName: string): AccountStatus | null {
 ```
 
 **Acceptance Criteria**:
-- [ ] Error caching configuration added (default: 30s)
-- [ ] Error cache separate from success cache
-- [ ] getCached checks both caches
-- [ ] All tests pass
-- [ ] Manual verification: Trigger error, wait 5s, refresh - should retry instead of showing stale error
+- [x] Error caching configuration added (default: 30s)
+- [x] Error cache separate from success cache
+- [x] getCached checks both caches
+- [x] All tests pass
+- [x] Manual verification: Trigger error, wait 5s, refresh - should retry instead of showing stale error
 
 **Why this is important**: Prevents suppressing legitimate recovery attempts. Short error cache prevents immediate retry storms while allowing retry after server recovery.
 
@@ -924,8 +924,8 @@ private sortAccountsByQuota(accounts: Account[]): Account[] {
 ```
 
 **Acceptance**: Optional - smart feature, not required
-- [ ] Accounts sorted by remaining quota
-- [ ] Prioritizes accounts with more quota
+- [x] Accounts sorted by remaining quota
+- [x] Prioritizes accounts with more quota
 
 **Why this matters**: Optimizes API usage by focusing on accounts that can provide fresh data.
 

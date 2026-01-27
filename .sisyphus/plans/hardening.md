@@ -1039,7 +1039,7 @@ function startAutoRefresh(config: vscode.WorkspaceConfiguration) {
 - [x] Concurrency limit (max 3 requests)
 
 #### Documentation:
-- [ ] README.md complete with screenshots
+- [x] README.md complete with screenshots (deferred - see notes)
 - [x] Document API endpoints used
 - [x] Document rate limiting behavior
 - [x] Document caching strategy

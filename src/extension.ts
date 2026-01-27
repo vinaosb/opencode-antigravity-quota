@@ -256,7 +256,12 @@ export function activate(context: vscode.ExtensionContext) {
         pollIntervalMs = 60000;
     }
 
-    intervalHandle = setInterval(refresh, pollIntervalMs);
+    intervalHandle = setInterval(() => {
+        if (!vscode.window.state.focused) {
+            return;
+        }
+        refresh();
+    }, pollIntervalMs);
     
     // Initial fetch
     refresh();

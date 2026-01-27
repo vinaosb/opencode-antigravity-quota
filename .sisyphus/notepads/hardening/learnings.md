@@ -80,3 +80,10 @@
 - Used remaining field from QuotaUsage as the primary metric for sorting.
 - Integrated sorting into fetchAll to ensure accounts with higher quota are processed first when concurrency is limited.
 - Added unit tests to verify sorting logic and handling of missing data.
+
+### Window Focus Awareness Implementation
+- Added window focus check using vscode.window.state.focused in setInterval callback.
+- Auto-refresh is skipped when VS Code window is not focused, reducing unnecessary API calls.
+- Manual refresh commands still work regardless of window focus state.
+- Implementation is simple and effective - single line check before calling refresh().
+- Verified all 113 tests pass with the new implementation.

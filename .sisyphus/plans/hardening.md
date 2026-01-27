@@ -957,8 +957,8 @@ function startAutoRefresh(config: vscode.WorkspaceConfiguration) {
 ```
 
 **Acceptance**: Optional - UX optimization
-- [ ] Auto-refresh skipped when unfocused
-- [ ] Manual refresh still works
+- [x] Auto-refresh skipped when unfocused
+- [x] Manual refresh still works
 
 **Why this matters**: Reduces unnecessary API calls and quota usage.
 

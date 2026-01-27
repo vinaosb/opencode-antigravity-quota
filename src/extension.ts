@@ -46,6 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
         const currentConfig = vscode.workspace.getConfiguration('opencodeQuota');
         const accounts = currentConfig.get<Account[]>('accounts', []);
         const adapterConfig = currentConfig.get<QuotaAdapterConfig>('adapterConfig', {});
+        const maxConcurrent = currentConfig.get<number>('maxConcurrentRequests', 3);
 
         if (accounts.length === 0) {
             statusBar.update([]);
@@ -53,7 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        const statuses = await quotaService.fetchAll(accounts, adapterConfig);
+        const statuses = await quotaService.fetchAll(accounts, adapterConfig, maxConcurrent);
         statusBar.update(statuses);
         accountsProvider.refresh(statuses);
     };

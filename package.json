@@ -76,6 +76,11 @@
           "type": "object",
           "default": {},
           "description": "Adapter configuration for mapping API responses"
+        },
+        "opencodeQuota.maxConcurrentRequests": {
+          "type": "number",
+          "default": 3,
+          "description": "Maximum number of concurrent API requests"
         }
       }
     }

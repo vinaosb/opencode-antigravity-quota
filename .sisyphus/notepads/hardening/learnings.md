@@ -99,3 +99,12 @@
 - Provided an example of the expected JSON response structure.
 - Documented how custom endpoints and adapters can be used via `opencodeQuota.adapterConfig`.
 - Ensured documentation accurately reflects the implementation in `QuotaService.ts` and `SecretStorageService.ts`.
+
+### Phase 4.3: Rate Limiting Documentation
+- Added a "Rate Limiting" section to README.md to explain the extension's resilience features.
+- Documented concurrency limiting (default 3 requests) using `p-limit`.
+- Explained in-flight request locking to prevent duplicate API calls for the same account.
+- Documented error caching with a 30s TTL to avoid rapid retries on failing endpoints.
+- Detailed the exponential backoff strategy, including the base delay, multiplier, and two-layer jitter (±20% base + 0-1000ms collision avoidance).
+- Explained cooldown periods and how they affect fetch attempts for rate-limited accounts.
+- Referenced relevant configuration settings to allow users to fine-tune these behaviors.

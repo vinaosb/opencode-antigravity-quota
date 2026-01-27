@@ -151,6 +151,34 @@ You should configure:
 }
 ```
 
+## Rate Limiting
+
+The extension includes several mechanisms to ensure resilience and to be a good citizen when interacting with API endpoints.
+
+### Concurrency Limiting
+To prevent overwhelming any single endpoint or triggering global rate limits, the extension throttles concurrent API requests across all accounts.
+- **Default Limit**: 3 concurrent requests.
+- **Configuration**: `opencodeQuota.maxConcurrentRequests`.
+
+### In-Flight Request Locking
+If multiple refresh requests are triggered simultaneously (e.g., a manual refresh during an automatic poll), the extension uses an in-flight lock to ensure only one request is sent per account. Subsequent callers will wait for and reuse the result of the active request.
+
+### Error Caching
+When an API request fails, the error response is cached for a short period. This prevents the extension from immediately retrying a failing endpoint, giving it time to recover.
+- **Default TTL**: 30 seconds.
+- **Configuration**: `opencodeQuota.backoff.errorCacheSeconds`.
+
+### Exponential Backoff & Jitter
+When a rate limit (HTTP 429) or server error (HTTP 5xx) is encountered, the extension applies an exponential backoff strategy for subsequent retries.
+- **Base Delay**: Starts at 10 seconds (`opencodeQuota.backoff.baseDelayMs`).
+- **Multiplier**: The delay doubles with each retry (`opencodeQuota.backoff.multiplier`).
+- **Jitter**: To avoid "thundering herd" issues where many clients retry at the same time, the extension adds two layers of randomness:
+  - **Base Jitter**: ±20% of the base delay.
+  - **Collision Jitter**: An additional 0-1000ms is added to every request.
+
+### Cooldown Periods
+Accounts hitting rate limits enter a "cooldown" state. During this time, the extension will skip any fetch attempts for that specific account and return the last known status (or the cached error). The Output panel will indicate the next allowed retry time.
+
 ## Available Commands
 
 | Command | Description |

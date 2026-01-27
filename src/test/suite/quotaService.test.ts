@@ -34,7 +34,18 @@ suite('QuotaService Test Suite', () => {
         sandbox.stub(SecretStorageService, 'instanceRef').get(() => secretStorageMock);
         axiosGetStub = sandbox.stub(axios, 'get');
         sandbox.stub(axios, 'isAxiosError').callsFake((err: any) => err.isAxiosError === true);
-        quotaService = new QuotaService(300, loggingServiceMock, historyServiceMock);
+        
+        // Mock Math.random to return 0.5 for deterministic jitter (which results in 0 jitter for the 20% part)
+        // and we'll handle the final 0-1000ms jitter by making it 500ms
+        sandbox.stub(Math, 'random').returns(0.5);
+
+        quotaService = new QuotaService(300, loggingServiceMock, historyServiceMock, {
+            baseDelayMs: 1000,
+            multiplier: 2,
+            maxDelayMs: 32000,
+            maxRetries: 5,
+            errorCacheSeconds: 0
+        });
     });
 
     teardown(() => {
@@ -60,10 +71,10 @@ suite('QuotaService Test Suite', () => {
         assert.strictEqual(cooldownResult.status, 'error');
         assert.ok(cooldownResult.error?.includes('Rate limit cooldown'));
 
-        currentTime += 1100;
+        currentTime += 1600; // Need enough time to pass 1000 + 500ms
         quotaService.clearCache();
         await quotaService.fetchQuota(account, adapterConfig);
-        assert.ok(loggingServiceMock.logInfo.calledWithMatch('retry #2 in 2000ms'));
+        assert.ok(loggingServiceMock.logInfo.calledWithMatch('retry #2 in 2500ms'));
     });
 
     test('per-account independent retry state', async () => {

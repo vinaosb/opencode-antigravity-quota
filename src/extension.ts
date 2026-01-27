@@ -6,7 +6,7 @@ import { HistoryService } from './services/HistoryService';
 import { QuotaStatusBar } from './ui/StatusBar';
 import { AccountsProvider } from './ui/AccountsProvider';
 import { DetailsView } from './ui/DetailsView';
-import { Account, QuotaAdapterConfig } from './models/types';
+import { Account, QuotaAdapterConfig, BackoffConfig } from './models/types';
 
 let intervalHandle: NodeJS.Timeout | undefined;
 
@@ -20,10 +20,20 @@ export function activate(context: vscode.ExtensionContext) {
 
     const config = vscode.workspace.getConfiguration('opencodeQuota');
     const ttl = config.get<number>('cacheTTLSeconds', 300);
+    
+    const backoffConfig: BackoffConfig = {
+        baseDelayMs: config.get<number>('backoff.baseDelayMs', 10000),
+        multiplier: config.get<number>('backoff.multiplier', 2),
+        maxDelayMs: config.get<number>('backoff.maxDelayMs', 300000),
+        maxRetries: config.get<number>('backoff.maxRetries', 8),
+        errorCacheSeconds: config.get<number>('backoff.errorCacheSeconds', 30)
+    };
+
     const quotaService = new QuotaService(
         ttl,
         LoggingService.instanceRef,
-        HistoryService.instanceRef
+        HistoryService.instanceRef,
+        backoffConfig
     );
     context.subscriptions.push(quotaService);
 

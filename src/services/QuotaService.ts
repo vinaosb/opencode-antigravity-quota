@@ -1,6 +1,6 @@
  import axios from 'axios';
 import pLimit from 'p-limit';
-import { Account, AccountStatus, QuotaAdapterConfig } from '../models/types';
+import { Account, AccountStatus, QuotaAdapterConfig, BackoffConfig } from '../models/types';
 
 import { SecretStorageService } from './SecretStorageService';
 import { QuotaAdapter } from '../adapter/QuotaAdapter';
@@ -12,13 +12,22 @@ export class QuotaService {
     private cacheTTL: number = 300 * 1000; // 5 mins default
     private rateLimitState: Map<string, { retryCount: number, nextRetryTime: Date }> = new Map();
     private inFlight: Map<string, Promise<AccountStatus | null>> = new Map();
+    private backoffConfig: BackoffConfig;
 
     constructor(
         ttlSeconds: number,
         private loggingService: LoggingService,
-        private historyService: HistoryService
+        private historyService: HistoryService,
+        backoffConfig?: BackoffConfig
     ) {
         this.cacheTTL = ttlSeconds * 1000;
+        this.backoffConfig = backoffConfig || {
+            baseDelayMs: 10000,
+            multiplier: 2,
+            maxDelayMs: 300000,
+            maxRetries: 8,
+            errorCacheSeconds: 30
+        };
     }
 
     async fetchQuota(account: Account, adapterConfig: QuotaAdapterConfig): Promise<AccountStatus> {
@@ -64,8 +73,11 @@ export class QuotaService {
             };
         }
 
-        if (cached && (now - cached.lastUpdated < this.cacheTTL)) {
-            return cached;
+        if (cached) {
+            const ttl = cached.status === 'error' ? this.backoffConfig.errorCacheSeconds * 1000 : this.cacheTTL;
+            if (now - cached.lastUpdated < ttl) {
+                return cached;
+            }
         }
 
         try {
@@ -105,15 +117,11 @@ export class QuotaService {
             
             if (isRateLimit) {
                 const currentRetry = rateLimit?.retryCount ?? 0;
-                const delay = 1000 * Math.pow(2, currentRetry);
-                const nextRetry = new Date(now + delay);
+                const nextRetryCount = Math.min(currentRetry + 1, this.backoffConfig.maxRetries);
+                const delay = this.calculateBackoff(nextRetryCount);
                 
-                this.rateLimitState.set(account.name, { 
-                    retryCount: Math.min(currentRetry + 1, 5), 
-                    nextRetryTime: nextRetry 
-                });
-                
-                this.loggingService.logInfo(`Rate limit or server error for ${account.name}, retry #${currentRetry + 1} in ${delay}ms`);
+                this.setCooldown(account.name, nextRetryCount, delay);
+                this.loggingService.logInfo(`Rate limit or server error for ${account.name}, retry #${nextRetryCount} in ${Math.round(delay)}ms`);
             }
 
             const errorMsg = axios.isAxiosError(error) 
@@ -128,10 +136,38 @@ export class QuotaService {
                 lastUpdated: now
             };
             
-            // Do not cache errors for full TTL, maybe shorter, but for now simple overwrite
+            // Do not cache errors for full TTL, maybe shorter
             this.cache.set(account.name, errorStatus);
             return errorStatus;
         }
+    }
+
+    private calculateBackoff(retryCount: number): number {
+        const baseMs = this.backoffConfig.baseDelayMs;
+        const maxMs = this.backoffConfig.maxDelayMs;
+        const multiplier = this.backoffConfig.multiplier;
+
+        // Exponential backoff
+        const exponentialDelay = baseMs * Math.pow(multiplier, retryCount - 1);
+
+        // Add jitter (20% of base delay)
+        const jitter = (Math.random() - 0.5) * baseMs * 0.4;
+
+        // Cap at max
+        const delay = Math.min(exponentialDelay + jitter, maxMs);
+
+        // Additional jitter to avoid synchronized retries
+        const finalJitter = Math.random() * 1000; // 0-1000ms
+
+        return delay + finalJitter;
+    }
+
+    private setCooldown(accountName: string, retryCount: number, delayMs: number) {
+        const nextRetry = new Date(Date.now() + delayMs);
+        this.rateLimitState.set(accountName, {
+            retryCount,
+            nextRetryTime: nextRetry
+        });
     }
 
     async fetchAll(accounts: Account[], adapterConfig: QuotaAdapterConfig, maxConcurrent = 3): Promise<AccountStatus[]> {

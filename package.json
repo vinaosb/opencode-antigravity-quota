@@ -81,6 +81,31 @@
           "type": "number",
           "default": 3,
           "description": "Maximum number of concurrent API requests"
+        },
+        "opencodeQuota.backoff.baseDelayMs": {
+          "type": "number",
+          "default": 10000,
+          "description": "Base delay for exponential backoff in milliseconds"
+        },
+        "opencodeQuota.backoff.multiplier": {
+          "type": "number",
+          "default": 2,
+          "description": "Multiplier for exponential backoff"
+        },
+        "opencodeQuota.backoff.maxDelayMs": {
+          "type": "number",
+          "default": 300000,
+          "description": "Maximum delay for exponential backoff in milliseconds"
+        },
+        "opencodeQuota.backoff.maxRetries": {
+          "type": "number",
+          "default": 8,
+          "description": "Maximum number of retries for rate limited requests"
+        },
+        "opencodeQuota.backoff.errorCacheSeconds": {
+          "type": "number",
+          "default": 30,
+          "description": "Duration to cache error responses in seconds"
         }
       }
     }

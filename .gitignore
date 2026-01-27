@@ -1,0 +1,30 @@
+node_modules
+out
+
+.vscode*
+
+# Logs
+*.log
+
+# Test outputs
+test_output.txt
+tsc_output.txt
+
+# Build artifacts
+*.vsix
+
+# Accidental files
+nul
+
+# IDE temp files
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+.nyc_output/

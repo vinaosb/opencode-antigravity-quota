@@ -1,0 +1,10 @@
+{
+  "usage": {
+    "total_tokens": 1500,
+    "requests": 45
+  },
+  "quota": {
+    "limit": 5000,
+    "reset_date": "2023-10-27T00:00:00Z"
+  }
+}

@@ -20,6 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     const config = vscode.workspace.getConfiguration('opencodeQuota');
     const ttl = config.get<number>('cacheTTLSeconds', 300);
+    const httpTimeoutMs = config.get<number>('httpTimeoutMs', 30000);
     
     const backoffConfig: BackoffConfig = {
         baseDelayMs: config.get<number>('backoff.baseDelayMs', 10000),
@@ -33,7 +34,8 @@ export function activate(context: vscode.ExtensionContext) {
         ttl,
         LoggingService.instanceRef,
         HistoryService.instanceRef,
-        backoffConfig
+        backoffConfig,
+        httpTimeoutMs
     );
     context.subscriptions.push(quotaService);
 

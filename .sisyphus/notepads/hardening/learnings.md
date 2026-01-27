@@ -108,3 +108,15 @@
 - Detailed the exponential backoff strategy, including the base delay, multiplier, and two-layer jitter (±20% base + 0-1000ms collision avoidance).
 - Explained cooldown periods and how they affect fetch attempts for rate-limited accounts.
 - Referenced relevant configuration settings to allow users to fine-tune these behaviors.
+
+## Phase 4.3 Documentation - Caching Strategy
+- Documented the two-tier caching strategy in README.md:
+    - Success cache: 5-minute TTL (configurable via `opencodeQuota.cacheTTLSeconds`).
+    - Error cache: 30-second TTL (configurable via `opencodeQuota.backoff.errorCacheSeconds`).
+- Updated `src/extension.ts` to ensure the cache is invalidated on:
+    - Manual refresh command (`opencodeQuota.refresh`).
+    - Account addition (`opencodeQuota.addAccount`).
+    - Account removal (`opencodeQuota.removeAccount`).
+    - Account edit (`opencodeQuota.editAccount`).
+    - Account import (`opencodeQuota.importFromOpenCode`).
+- Verified that automatic polls do not clear the cache, allowing them to reuse results if they haven't expired.

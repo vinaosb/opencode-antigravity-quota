@@ -95,6 +95,7 @@ You can fine-tune the extension's behavior in `settings.json`:
 | `opencodeQuota.backoff.maxDelayMs` | `300000` | Maximum delay for exponential backoff (ms). |
 | `opencodeQuota.backoff.maxRetries` | `8` | Maximum number of retries for rate-limited requests. |
 | `opencodeQuota.backoff.errorCacheSeconds` | `30` | Duration to cache error responses. |
+| `opencodeQuota.cacheTTLSeconds` | `300` | Success cache TTL in seconds. |
 
 ## API Endpoints
 
@@ -178,6 +179,29 @@ When a rate limit (HTTP 429) or server error (HTTP 5xx) is encountered, the exte
 
 ### Cooldown Periods
 Accounts hitting rate limits enter a "cooldown" state. During this time, the extension will skip any fetch attempts for that specific account and return the last known status (or the cached error). The Output panel will indicate the next allowed retry time.
+
+## Caching Strategy
+
+The extension employs a two-tier in-memory caching strategy to ensure responsiveness and reduce unnecessary load on API endpoints.
+
+### Success Cache
+Successful quota responses are cached for **5 minutes** (configurable via `opencodeQuota.cacheTTLSeconds`). During this period, subsequent requests for the same account will return the cached data immediately.
+
+### Error Cache
+To prevent rapid retries against a failing or rate-limited endpoint, error responses are cached for a short duration.
+- **Default TTL**: 30 seconds.
+- **Configuration**: `opencodeQuota.backoff.errorCacheSeconds`.
+
+### Key Characteristics
+- **Per-Account Isolation**: Each account has its own independent cache entry.
+- **In-Flight Locking**: If multiple requests for the same account occur simultaneously, the extension ensures only one API call is made, with all callers sharing the same result.
+- **Non-Persistent**: The cache is stored in memory and is cleared when VS Code is restarted.
+
+### Cache Invalidation
+The cache is automatically invalidated in the following scenarios:
+- **Manual Refresh**: Running the `OpenCode Quota: Refresh` command clears all cached data.
+- **Account Modification**: Adding, editing, or removing an account triggers a cache clear to ensure data consistency.
+- **Manual Clear**: Programmatic calls to `clearCache` (e.g., during development or testing).
 
 ## Available Commands
 

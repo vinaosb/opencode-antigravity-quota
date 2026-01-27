@@ -74,6 +74,7 @@ export function activate(context: vscode.ExtensionContext) {
     // 4. Register Commands
     context.subscriptions.push(
         vscode.commands.registerCommand('opencodeQuota.refresh', () => {
+            quotaService.clearCache();
             refresh();
             vscode.window.showInformationMessage('Quota refreshed.');
         })
@@ -105,6 +106,7 @@ export function activate(context: vscode.ExtensionContext) {
             await config.update('accounts', [...accounts, newAccount], vscode.ConfigurationTarget.Global);
             
             vscode.window.showInformationMessage(`Account ${name} added.`);
+            quotaService.clearCache();
             refresh();
         })
     );
@@ -121,9 +123,10 @@ export function activate(context: vscode.ExtensionContext) {
              if (accountToRemove) {
                  await SecretStorageService.instanceRef.deleteSecret(accountToRemove.tokenSecretName);
                  const newAccounts = accounts.filter(a => a.name !== selected);
-                 await config.update('accounts', newAccounts, vscode.ConfigurationTarget.Global);
-                 vscode.window.showInformationMessage(`Account ${selected} removed.`);
-                 refresh();
+                  await config.update('accounts', newAccounts, vscode.ConfigurationTarget.Global);
+                  vscode.window.showInformationMessage(`Account ${selected} removed.`);
+                  quotaService.clearCache();
+                  refresh();
              }
         })
     );
@@ -183,6 +186,7 @@ export function activate(context: vscode.ExtensionContext) {
 
             await config.update('accounts', updatedAccounts, vscode.ConfigurationTarget.Global);
             vscode.window.showInformationMessage(`Account ${name} updated.`);
+            quotaService.clearCache();
             refresh();
         })
     );
@@ -225,6 +229,7 @@ export function activate(context: vscode.ExtensionContext) {
             
             vscode.window.showInformationMessage(`Successfully imported ${imported.length} accounts from OpenCode.`, 'OK');
             LoggingService.instanceRef.logInfo(`Imported ${imported.length} OpenCode accounts: ${imported.map(a => a.name).join(', ')}`);
+            quotaService.clearCache();
             refresh();
         })
     );

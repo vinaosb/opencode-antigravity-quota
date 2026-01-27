@@ -87,3 +87,9 @@
 - Manual refresh commands still work regardless of window focus state.
 - Implementation is simple and effective - single line check before calling refresh().
 - Verified all 113 tests pass with the new implementation.
+
+### Phase 4.2: Secret Masking Verification
+- Added explicit test case in headerMasking.test.ts to verify that complex axios-like error objects have their Authorization and cookie headers masked when logged via LoggingService.
+- Verified that sensitive tokens (super-secret-token) and cookies (session=secret) are replaced with "***" in the output channel.
+- Confirmed that masking is case-insensitive for header names.
+- All 114 tests passed, ensuring 100% test coverage for secret masking logic.

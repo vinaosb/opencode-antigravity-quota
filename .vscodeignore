@@ -1,0 +1,59 @@
+# VSCode extension packaging ignore file
+
+# Dependencies
+node_modules/
+out/test/
+.vscode-test/
+
+# Build artifacts
+*.vsix
+*.tgz
+
+# Source maps
+*.js.map
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.crt
+
+# Development files
+.ts
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+.mocha/
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Sisyphus work directory (internal)
+.sisyphus/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation (not needed in package)
+docs/
+NOTES.md
+TODO.md
+CHANGELOG.md
+
+# Test files
+test/
+**/*.test.ts
+**/*.spec.ts

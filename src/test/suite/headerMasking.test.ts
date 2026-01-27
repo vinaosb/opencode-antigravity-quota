@@ -60,6 +60,31 @@ suite('Header Masking Test Suite', () => {
         assert.ok(!logMessage.includes('session=12345'));
     });
 
+    test('LoggingService should mask Authorization header in complex axios-like error objects', () => {
+        const complexError = {
+            message: 'Network Error',
+            config: {
+                headers: {
+                    'Authorization': 'Bearer super-secret-token',
+                    'Accept': 'application/json'
+                }
+            },
+            response: {
+                headers: {
+                    'set-cookie': 'session=secret'
+                }
+            }
+        };
+
+        LoggingService.instanceRef.logError('Testing complex error', complexError);
+
+        const logMessage = outputChannelMock.appendLine.firstCall.args[0];
+        assert.ok(logMessage.includes('"Authorization": "***"'), 'Authorization should be masked');
+        assert.ok(logMessage.includes('"set-cookie": "***"'), 'set-cookie should be masked');
+        assert.ok(!logMessage.includes('super-secret-token'), 'Token should not be in logs');
+        assert.ok(!logMessage.includes('session=secret'), 'Cookie should not be in logs');
+    });
+
     test('QuotaService should strip headers from axios errors before logging', async () => {
         const historyServiceMock = { addHistoryPoint: sandbox.stub().resolves(), getHistory: sandbox.stub().returns([]) };
         const secretStorageMock = { getSecret: sandbox.stub().resolves('test-token') };

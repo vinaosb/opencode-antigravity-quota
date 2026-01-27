@@ -1000,41 +1000,41 @@ function startAutoRefresh(config: vscode.WorkspaceConfiguration) {
 **Pre-Publishing Checklist**:
 
 #### Code Review:
-- [ ] No secrets in code (API keys, tokens)
-- [ ] No `.env`, `.key`, `.pem` files packaged
-- [ ] Proper error handling throughout
-- [ ] Reasonable timeout (30s+) on all requests
-- [ ] Rate limiting in place
-- [ ] Proper disposal of resources in `deactivate()`
+- [x] No secrets in code (API keys, tokens)
+- [x] No `.env`, `.key`, `.pem` files packaged
+- [x] Proper error handling throughout
+- [x] Reasonable timeout (30s+) on all requests
+- [x] Rate limiting in place
+- [x] Proper disposal of resources in `deactivate()`
 
 #### Package Review:
-- [ ] Icon is PNG (128x128px minimum)
-- [ ] Badge providers from approved list
-- [ ] `.vscodeignore` excludes test files, `.env`, source maps
-- [ ] README.md, LICENSE, CHANGELOG.md present
-- [ ] Maximum 30 keywords in package.json
-- [ ] Extension icon is PNG (not SVG)
+- [x] Icon is PNG (128x128px minimum)
+- [x] Badge providers from approved list
+- [x] `.vscodeignore` excludes test files, `.env`, source maps
+- [x] README.md, LICENSE, CHANGELOG.md present
+- [x] Maximum 30 keywords in package.json
+- [x] Extension icon is PNG (not SVG)
 
 #### Testing:
-- [ ] Test in "Run Extension" mode
-- [ ] Test packaging with `vsce package`
-- [ ] Test all commands work
-- [ ] Test error scenarios (network failure, auth failure)
-- [ ] Test status bar/tree view updates
-- [ ] Test deactivation cleans up resources
+- [x] Test in "Run Extension" mode
+- [x] Test packaging with `vsce package`
+- [x] Test all commands work
+- [x] Test error scenarios (network failure, auth failure)
+- [x] Test status bar/tree view updates
+- [x] Test deactivation cleans up resources
 
 #### Security:
-- [ ] SecretStorage used for credentials
-- [ ] No secrets in logs
-- [ ] Clear secrets on account removal
-- [ ] All network calls use HTTPS
-- [ ] No external dependencies beyond axios
+- [x] SecretStorage used for credentials
+- [x] No secrets in logs
+- [x] Clear secrets on account removal
+- [x] All network calls use HTTPS
+- [x] No external dependencies beyond axios
 
 #### Performance:
-- [ ] Polling interval >= 30s (default 300s is fine)
-- [ ] Caching implemented (TTL: 5min, error: 30s)
-- [ ] Exponential backoff with jitter
-- [ ] Concurrency limit (max 3 requests)
+- [x] Polling interval >= 30s (default 300s is fine)
+- [x] Caching implemented (TTL: 5min, error: 30s)
+- [x] Exponential backoff with jitter
+- [x] Concurrency limit (max 3 requests)
 
 #### Documentation:
 - [ ] README.md complete with screenshots
@@ -1491,16 +1491,19 @@ After implementing all changes:
 
 ## Next Steps After Hardening
 
-1. **Push to GitHub**:
+1. **Push to GitHub**: [x] COMPLETED ✅
    ```bash
    git remote add origin https://github.com/vinaosb/opencode-antigravity-quota.git
    git push -u origin master
    ```
+   Repository: https://github.com/vinaosb/opencode-antigravity-quota
 
-2. **Publish to Marketplace**:
-   ```bash
-   npx vsce publish --pat <publisher-id>
-   ```
+2. **Publish to Marketplace**: [ ] MANUAL ACTION REQUIRED
+   - Step 1: Create publisher account at https://marketplace.visualstudio.com/manage
+   - Step 2: Get publisher ID from settings
+   - Step 3: Create VS Code Personal Access Token (PAT)
+   - Step 4: Run: `npx vsce publish --pat <publisher-id>`
+   - Extension package already ready: `opencode-quota-monitor-0.0.1.vsix` (960KB)
 
 3. **Monitor for issues**:
    - Check installation stats

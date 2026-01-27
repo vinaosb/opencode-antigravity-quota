@@ -1264,8 +1264,8 @@ describe('Hardening Integration Tests', () => {
 
 ### Phase 3: LOW (P2) - OPTIONAL BUT RECOMMENDED
 - [x] Configurable polling interval with 60s minimum
-- [ ] Account rotation by remaining quota
-- [ ] Window focus awareness
+- [x] Account rotation by remaining quota
+- [x] Window focus awareness
 
 ### Phase 4: SECURITY (P0) - ALREADY PASSING
 - [x] No changes needed - current SecretStorage is correct

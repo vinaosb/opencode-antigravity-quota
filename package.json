@@ -71,6 +71,12 @@
           "default": 300,
           "description": "Automatic refresh interval in seconds"
         },
+        "opencodeQuota.pollIntervalMs": {
+          "type": "number",
+          "default": 300000,
+          "minimum": 60000,
+          "description": "Automatic refresh interval in milliseconds (minimum 60s)"
+        },
         "opencodeQuota.cacheTTLSeconds": {
           "type": "number",
           "default": 600,

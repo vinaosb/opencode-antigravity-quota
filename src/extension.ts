@@ -240,8 +240,23 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     // 5. Setup Auto Refresh
-    const refreshInterval = config.get<number>('refreshIntervalSeconds', 300) * 1000;
-    intervalHandle = setInterval(refresh, refreshInterval);
+    let pollIntervalMs = config.get<number>('pollIntervalMs', 300000);
+
+    // Backward compatibility for refreshIntervalSeconds if pollIntervalMs is at default
+    if (pollIntervalMs === 300000) {
+        const refreshIntervalSeconds = config.get<number>('refreshIntervalSeconds', 300);
+        if (refreshIntervalSeconds !== 300) {
+            pollIntervalMs = refreshIntervalSeconds * 1000;
+        }
+    }
+
+    // Validate minimum
+    if (pollIntervalMs < 60000) {
+        LoggingService.instanceRef.logInfo(`WARNING: Polling interval ${pollIntervalMs}ms is below minimum 60s. Using 60s instead.`);
+        pollIntervalMs = 60000;
+    }
+
+    intervalHandle = setInterval(refresh, pollIntervalMs);
     
     // Initial fetch
     refresh();

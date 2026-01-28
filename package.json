@@ -3,11 +3,38 @@
   "displayName": "OpenCode Quota Monitor",
   "description": "Monitor usage quotas across multiple OpenCode accounts",
   "version": "0.0.1",
+  "publisher": "vinaosb",
+  "author": "vinaosb",
+  "packageManager": "npm@10.x",
+  "engines": {
+    "vscode": "^1.80.0",
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vinaosb/opencode-antigravity-quota"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },
+  "license": "MIT",
+  "keywords": [
+    "opencode",
+    "quota",
+    "monitor",
+    "usage",
+    "api",
+    "dashboard",
+    "analytics",
+    "rate-limit"
+  ],
+  "homepage": "https://github.com/vinaosb/opencode-antigravity-quota#readme",
+  "bugs": {
+    "url": "https://github.com/vinaosb/opencode-antigravity-quota/issues"
+  },
   "categories": [
-    "Other"
+    "Other",
+    "Snippets"
   ],
   "activationEvents": [
     "onStartupFinished"

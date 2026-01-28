@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.4] - 2026-01-28
+
+### Fixed
+- Remove unsafe "nul" file from extension package (Windows device name issue)
+- Add "nul" to .vscodeignore to prevent future inclusion
+
 ## [0.0.3] - 2026-01-28
 
 ### Fixed

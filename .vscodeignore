@@ -46,6 +46,7 @@ coverage/
 # OS files
 .DS_Store
 Thumbs.db
+nul
 
 # Documentation (not needed in package)
 docs/

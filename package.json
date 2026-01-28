@@ -2,7 +2,7 @@
   "name": "opencode-quota-monitor",
   "displayName": "OpenCode Quota Monitor",
   "description": "Monitor usage quotas across multiple OpenCode accounts",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "vinaosb",
   "author": "vinaosb",
   "packageManager": "npm@10.x",

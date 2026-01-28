@@ -1,0 +1,3 @@
+#!/bin/sh
+# husky commit-msg hook for commitlint
+npx --no -- commitlint --edit $1

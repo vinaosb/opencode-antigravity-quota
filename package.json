@@ -150,6 +150,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
+    "prepare": "husky install",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
@@ -157,6 +158,13 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.6",
+    "@semantic-release/release-notes-generator": "^14.1.0",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/nock": "^10.0.3",
@@ -168,8 +176,11 @@
     "@vscode/test-electron": "^2.3.0",
     "eslint": "^8.39.0",
     "glob": "^8.1.0",
+    "husky": "^9.1.7",
     "mocha": "^10.2.0",
     "nock": "^14.0.10",
+    "semantic-release": "^24.2.9",
+    "semantic-release-vsce": "^6.0.22",
     "sinon": "^21.0.1",
     "typescript": "^5.0.4"
   },

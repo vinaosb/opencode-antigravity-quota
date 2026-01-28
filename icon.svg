@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background: transparent -->
+  <!-- Pie chart with 3 segments -->
+  <!-- Segment 1: 40% used (0-144 degrees) - Primary #007ACC -->
+  <path d="M 64 64 L 64 0 A 64 64 0 0 1 1 37.69 102.45 Z"
+        fill="#007ACC"
+        stroke="#007ACC"
+        stroke-width="3"/>
+  <!-- Segment 2: 30% remaining (144-252 degrees) - Lighter #4FC1FF -->
+  <path d="M 64 64 L 37.69 102.45 A 64 64 0 0 1 1 64 128 Z"
+        fill="#4FC1FF"
+        stroke="#4FC1FF"
+        stroke-width="3"/>
+  <!-- Segment 3: 30% buffer (252-360 degrees) - Primary #007ACC -->
+  <path d="M 64 64 L 64 128 A 64 64 0 0 1 1 64 0 Z"
+        fill="#007ACC"
+        stroke="#007ACC"
+        stroke-width="3"/>
+  <!-- Center circle to create donut effect (optional, modern look) -->
+  <circle cx="64" cy="64" r="20"
+          fill="#007ACC"
+          stroke="#007ACC"
+          stroke-width="2"/>
+</svg>

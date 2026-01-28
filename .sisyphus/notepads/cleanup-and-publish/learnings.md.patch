@@ -1,0 +1,4 @@
+2026-01-28 07:19: vsce package run
+- Command: npx vsce package
+- Result: Success, created opencode-quota-monitor-0.0.3.vsix (48 files, 52.59KB)
+- Notes: Prepublish script ran 'npm run vscode:prepublish' -> compiled via tsc. No validation errors reported in output. 

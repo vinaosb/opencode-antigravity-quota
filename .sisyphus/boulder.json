@@ -1,11 +1,8 @@
 {
-  "active_plan": "C:\\Users\\vsbb1\\source\\repos\\antigravity-opencode-quota\\.sisyphus\\plans\\hardening.md",
-  "started_at": "2026-01-27T05:35:31.451Z",
+  "active_plan": "C:\\Users\\vsbb1\\source\\repos\\antigravity-opencode-quota\\.sisyphus\\plans\\fix-missing-command.md",
+  "started_at": "2026-01-28T22:49:06.293Z",
   "session_ids": [
-    "ses_4028f9bfaffejkuYjFn7Sfo6oD"
+    "ses_3f9ed9209ffe0RAyY4AhyYMKtH"
   ],
-  "plan_name": "hardening",
-  "dependencies": {
-    "p-limit": "^4.0.0"
-  }
+  "plan_name": "fix-missing-command"
 }
